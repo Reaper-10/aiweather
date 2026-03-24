@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather AI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI';
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            text-align: center;
+            padding-top: 100px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            width: 300px;
+            margin: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        input, select {
+            width: 90%;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #00c6ff;
+            color: black;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>🌦️ Weather AI</h2>
+
+    <form method="POST">
+        <input type="text" name="name" placeholder="Your Name" required>
+
+        <select name="profile">
+            <option value="farmer">Farmer</option>
+            <option value="gym">Gym</option>
+            <option value="student">Student</option>
+            <option value="traveler">Traveler</option>
+            <option value="sports">Sports</option>
+            <option value="office">Office</option>
+            <option value="rider">Rider</option>
+            <option value="home">Home</option>
+            <option value="photographer">Photographer</option>
+        </select>
+
+        <input type="text" name="location" placeholder="Location">
+
+        <button type="submit">Start</button>
+    </form>
+</div>
+
+</body>
+</html>

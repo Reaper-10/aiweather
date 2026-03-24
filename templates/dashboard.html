@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Weather Dashboard</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI';
+    background: linear-gradient(135deg, #4e73b8, #7da2d6);
+}
+
+/* MAIN */
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+/* LEFT PANEL */
+.left {
+    width: 30%;
+    background: linear-gradient(180deg, #4e73b8, #2f5597);
+    color: white;
+    padding: 30px;
+    border-radius: 0 30px 30px 0;
+}
+
+.temp {
+    font-size: 70px;
+    font-weight: bold;
+}
+
+.weather {
+    margin-top: 10px;
+    font-size: 20px;
+}
+
+/* RIGHT PANEL */
+.right {
+    flex: 1;
+    background: #eef2f7;
+    border-radius: 30px 0 0 30px;
+    padding: 25px;
+    overflow-y: auto;
+}
+
+/* CARD */
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* DARK CARD */
+.dark {
+    background: #0f172a;
+    color: white;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+/* SMALL CARD */
+.small-card {
+    background: white;
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* HOURLY */
+.hourly {
+    display: flex;
+    justify-content: space-between;
+}
+
+.hour {
+    text-align: center;
+    font-size: 12px;
+}
+
+/* ARC */
+.arc {
+    width: 100%;
+    height: 100px;
+    border-top: 2px dashed #38bdf8;
+    border-radius: 50%;
+    position: relative;
+}
+
+.sun {
+    width: 20px;
+    height: 20px;
+    background: yellow;
+    border-radius: 50%;
+    position: absolute;
+    top: -10px;
+    left: 50%;
+}
+
+/* AIR BAR */
+.bar {
+    width: 100%;
+    height: 10px;
+    background: #1e293b;
+    border-radius: 10px;
+}
+
+.level {
+    height: 100%;
+    width: 35%;
+    background: linear-gradient(90deg, green, yellow, red);
+    border-radius: 10px;
+}
+
+/* BUTTON */
+button {
+    padding: 10px 15px;
+    border: none;
+    background: #4e73b8;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* INPUT */
+input, select {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- LEFT -->
+    <div class="left">
+        <h3>{{user}}</h3>
+        <p>Weather Dashboard</p>
+
+        <div class="temp">{{weather.temp}}°</div>
+        <div class="weather">Current Weather</div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right">
+
+        <!-- LOCATION -->
+        <div class="card">
+            <form method="POST">
+                <input name="location" placeholder="Enter location">
+                <select name="profile">
+                    <option value="farmer">Farmer</option>
+                    <option value="gym">Gym</option>
+                    <option value="student">Student</option>
+                </select>
+                <button>Load</button>
+            </form>
+        </div>
+
+        <!-- CHAT -->
+        <div class="card">
+            <form method="POST" action="/chat">
+                <input name="message" placeholder="Ask weather...">
+                <button>Send</button>
+            </form>
+
+            {% if response %}
+            <p><b>You:</b> {{user_input}}</p>
+            <p><b>AI:</b> {{response}}</p>
+            {% endif %}
+        </div>
+
+        <!-- HOURLY -->
+        <div class="card dark">
+            <h3>Hourly Forecast</h3>
+            <div class="hourly">
+                <div class="hour">06:00<br>🌤<br>29°</div>
+                <div class="hour">07:00<br>☀️<br>31°</div>
+                <div class="hour">08:00<br>🌧<br>28°</div>
+                <div class="hour">09:00<br>🌧<br>26°</div>
+                <div class="hour">10:00<br>🌤<br>29°</div>
+            </div>
+        </div>
+
+        <!-- WEATHER DETAILS -->
+        <div class="card dark">
+            <h3>Current Weather</h3>
+            <div class="grid">
+                <div>Humidity<br><b>{{weather.humidity}}%</b></div>
+                <div>Wind<br><b>{{weather.wind}} km/h</b></div>
+                <div>Pressure<br><b>{{weather.pressure}}</b></div>
+                <div>Feels Like<br><b>{{weather.feels}}°</b></div>
+                <div>UV Index<br><b>{{weather.uv}}</b></div>
+                <div>Rain<br><b>{{weather.temp}}°</b></div>
+            </div>
+        </div>
+
+        <!-- SUN ARC -->
+        <div class="card dark">
+            <h3>Sun Cycle</h3>
+            <div class="arc">
+                <div class="sun"></div>
+            </div>
+        </div>
+
+        <!-- AIR QUALITY -->
+        <div class="card dark">
+            <h3>Air Quality</h3>
+            <div class="bar">
+                <div class="level"></div>
+            </div>
+            <p>Air quality is satisfactory</p>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

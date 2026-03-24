@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Weather AI</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI';
+}
+
+body {
+    height: 100vh;
+    background: linear-gradient(135deg, #dfe9f3, #ffffff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* MAIN CARD */
+.container {
+    width: 1750px;
+    height: 820px;
+    background: #f5f7fb;
+    border-radius: 30px;
+    display: flex;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+/* LEFT SIDE */
+.left {
+    width: 100%;
+    padding: 50px;
+    position: relative;
+}
+
+/* CURVED EFFECT */
+.left::before {
+    content: "";
+    position: absolute;
+    right: -120px;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    background: #f5f7fb;
+    border-radius: 50%;
+}
+
+/* TEXT */
+.title {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.subtitle {
+    margin-top: 10px;
+    color: #555;
+}
+
+.temp {
+    font-size: 60px;
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.temp img {
+    width: 60px;
+    margin-left: 10px;
+}
+
+/* TIMELINE */
+.timeline {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+/* RIGHT SIDE */
+.right {
+    width: 50%;
+    background: linear-gradient(180deg, #5a8fd8, #3b6fb6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.right img {
+    width: 260px;
+}
+
+/* TOP BUTTONS */
+.top-buttons {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+}
+
+.btn {
+    padding: 10px 24px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+/* LOGIN */
+.login-btn {
+    background: linear-gradient(145deg, #ffeaa7, #f6e58d);
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.2),
+                -5px -5px 10px rgba(255,255,255,0.6);
+}
+
+/* SIGNUP */
+.signup-btn {
+    background: linear-gradient(145deg, #dfe6e9, #b2bec3);
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.2),
+                -5px -5px 10px rgba(255,255,255,0.6);
+}
+
+.btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 0 20px rgba(90,143,216,0.7);
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+.login-btn {
+    background: #f6e58d;
+}
+
+.signup-btn {
+    background: #dcdde1;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+}
+
+.modal-box {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    width: 320px;
+    padding: 30px;
+    margin: 12% auto;
+    border-radius: 25px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3),
+                inset 0 0 10px rgba(255,255,255,0.2);
+    animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        width: 95%;
+        height: auto;
+    }
+
+    .left, .right {
+        width: 100%;
+        text-align: center;
+    }
+
+    .right img {
+        width: 150px;
+    }
+}
+input {
+    width: 90%;
+    padding: 12px;
+    margin: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+input {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    outline: none;
+    backdrop-filter: blur(10px);
+}
+
+.submit {
+    background: linear-gradient(45deg, #5a8fd8, #3b6fb6);
+    box-shadow: 0 0 15px rgba(90,143,216,0.6);
+}
+
+.submit:hover {
+    box-shadow: 0 0 30px rgba(90,143,216,1);
+    transform: scale(1.05);
+}
+
+.submit {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    background: #5a8fd8;
+    color: white;
+    cursor: pointer;
+}
+
+/* TOAST */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #ff4d4d;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- TOP BUTTONS -->
+    <div class="top-buttons">
+        <button class="btn login-btn" onclick="openModal('login')">Login</button>
+        <button class="btn signup-btn" onclick="openModal('signup')">Sign Up</button>
+    </div>
+
+    <!-- LEFT -->
+    <div class="left">
+
+        <div class="title">Grab Your Umbrella Today!</div>
+        <div class="subtitle">Weather AI</div>
+
+        <div class="temp">
+            15° C
+            <img src="https://cdn-icons-png.flaticon.com/512/1163/1163657.png">
+        </div>
+
+        <div class="timeline">
+            <div>8:00<br>🌧</div>
+            <div>12:00<br>🌬</div>
+            <div>16:00<br>🌧</div>
+            <div>20:00<br>☀️</div>
+        </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right">
+        <img src="https://cdn-icons-png.flaticon.com/512/1779/1779940.png">
+    </div>
+
+</div>
+
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="modal">
+    <div class="modal-box">
+        <h3>Login</h3>
+        <form method="POST">
+            <input name="username" placeholder="Username">
+            <input name="password" type="password" placeholder="Password">
+            <button class="submit">Login</button>
+        </form>
+    </div>
+</div>
+
+<!-- SIGNUP MODAL -->
+<div id="signupModal" class="modal">
+    <div class="modal-box">
+        <h3>Sign Up</h3>
+        <form method="POST" action="/signup">
+            <input name="username" placeholder="Username">
+            <input name="password" type="password">
+            <button class="submit">Create</button>
+        </form>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast">Invalid Credentials</div>
+
+<script>
+function openModal(type) {
+    document.getElementById(type + "Modal").style.display = "block";
+}
+
+// close on outside click
+window.onclick = function(e) {
+    if (e.target.className === "modal") {
+        e.target.style.display = "none";
+    }
+}
+<script>
+function setWeatherBackground(condition) {
+    condition = condition.toLowerCase();
+
+    if (condition.includes("rain")) {
+        document.body.style.background = "linear-gradient(135deg, #2c3e50, #4ca1af)";
+    } 
+    else if (condition.includes("cloud")) {
+        document.body.style.background = "linear-gradient(135deg, #bdc3c7, #2c3e50)";
+    } 
+    else {
+        document.body.style.background = "linear-gradient(135deg, #fceabb, #f8b500)";
+    }
+}
+</script>
+// show error
+function showToast() {
+    let t = document.getElementById("toast");
+    t.style.display = "block";
+    setTimeout(() => t.style.display = "none", 2500);
+}
+</script>
+{% if error %}
+<script>showToast()</script>
+{% endif %}
+
+<script>
+setWeatherBackground("{{weather.condition}}");
+</script>
+</body>
+</html>

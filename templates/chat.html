@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI';
+            background: #0f172a;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .left, .right {
+            flex: 1;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: #38bdf8;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    Welcome {{name}} ({{profile}})
+</div>
+
+<div class="container">
+
+    <!-- LEFT SIDE -->
+    <div class="left">
+
+        <div class="card">
+            <h3>💬 Chat</h3>
+
+            <form method="POST" action="/chat">
+                <input type="text" name="message" placeholder="Ask weather..." required>
+                <button type="submit">Send</button>
+            </form>
+
+            {% if user_input %}
+            <p><b>You:</b> {{user_input}}</p>
+            <p><b>AI:</b> {{response}}</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right">
+
+        <div class="card">
+            <h3>🌡️ Weather Overview</h3>
+            <p>Temperature: 27°C</p>
+            <p>Humidity: 60%</p>
+            <p>Condition: Cloudy</p>
+        </div>
+
+        <div class="card">
+            <h3>📊 Temperature Trend</h3>
+            <canvas id="chart"></canvas>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const ctx = document.getElementById('chart');
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Morning', 'Noon', 'Evening', 'Night'],
+        datasets: [{
+            label: 'Temp (°C)',
+            data: [24, 30, 28, 25],
+            borderWidth: 2
+        }]
+    }
+});
+</script>
+
+</body>
+</html>
