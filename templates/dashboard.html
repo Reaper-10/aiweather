@@ -1,139 +1,420 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Weather Dashboard</title>
+<title>AI Weather Assistant - Dashboard</title>
 
 <style>
-body {
+* {
     margin: 0;
-    font-family: 'Segoe UI';
-    background: linear-gradient(135deg, #4e73b8, #7da2d6);
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* MAIN */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
 .container {
     display: flex;
     height: 100vh;
+    gap: 0;
 }
 
-/* LEFT PANEL */
 .left {
-    width: 30%;
-    background: linear-gradient(180deg, #4e73b8, #2f5597);
+    width: 28%;
+    background: linear-gradient(180deg, #4e73b8 0%, #2f5597 100%);
     color: white;
-    padding: 30px;
-    border-radius: 0 30px 30px 0;
-}
-
-.temp {
-    font-size: 70px;
-    font-weight: bold;
-}
-
-.weather {
-    margin-top: 10px;
-    font-size: 20px;
-}
-
-/* RIGHT PANEL */
-.right {
-    flex: 1;
-    background: #eef2f7;
-    border-radius: 30px 0 0 30px;
-    padding: 25px;
+    padding: 35px;
+    border-radius: 0 40px 40px 0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     overflow-y: auto;
 }
 
-/* CARD */
+.left h1 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logout-btn {
+    background: linear-gradient(145deg, #ffeaa7, #f6e58d);
+    color: #333;
+    padding: 8px 16px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+}
+
+.temp {
+    font-size: 80px;
+    font-weight: bold;
+    margin: 20px 0;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.weather-info {
+    font-size: 16px;
+    margin: 15px 0;
+    opacity: 0.95;
+}
+
+.weather-condition {
+    font-size: 22px;
+    margin-top: 10px;
+    opacity: 0.9;
+}
+
+.right {
+    flex: 1;
+    background: #f0f4f8;
+    border-radius: 40px 0 0 40px;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
 .card {
     background: white;
     border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 18px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
 }
 
-/* DARK CARD */
+.card h3 {
+    margin-bottom: 15px;
+    color: #2d3748;
+    font-size: 18px;
+}
+
 .dark {
     background: #0f172a;
     color: white;
 }
 
-/* GRID */
-.grid {
+.dark h3 {
+    color: white;
+}
+
+.location-form {
+    display: flex;
+    gap: 10px;
+}
+
+.location-form input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.location-form input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.location-form button {
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.location-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.profile-selector {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.profile-selector select {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.3s;
+}
+
+.profile-selector select:hover,
+.profile-selector select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.chatbot-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 500px;
+    max-height: 60vh;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    background: white;
+}
+
+.chat-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: white;
+}
+
+.chat-header p {
+    margin: 5px 0 0 0;
+    font-size: 11px;
+    opacity: 0.9;
+}
+
+.chat-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 25px;
+    background: #0f172a;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.chat-history-empty {
+    color: #94a3b8;
+    text-align: center;
+    margin-top: 60px;
+    font-size: 14px;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bot-message {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 12px;
+    animation: slideIn 0.3s ease;
+}
+
+.user-message {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+    animation: slideIn 0.3s ease;
+}
+
+.bot-text {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 15px;
+    border-bottom-left-radius: 3px;
+    word-wrap: break-word;
+    max-width: 75%;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.user-text {
+    background: #1e293b;
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 15px;
+    border-bottom-right-radius: 3px;
+    word-wrap: break-word;
+    max-width: 75%;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.chat-input-area {
+    padding: 12px 15px;
+    border-top: 2px solid #1e293b;
+    background: #0f172a;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input-area input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #475569;
+    border-radius: 10px;
+    background: #1e293b;
+    color: white;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.chat-input-area input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.chat-input-area input::placeholder {
+    color: #64748b;
+}
+
+.chat-send-btn {
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.chat-send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.weather-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
 }
 
-/* SMALL CARD */
-.small-card {
-    background: white;
-    padding: 15px;
+.weather-item {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    padding: 20px;
     border-radius: 15px;
     text-align: center;
-    font-weight: 500;
+    border-left: 4px solid #667eea;
 }
 
-/* HOURLY */
-.hourly {
-    display: flex;
-    justify-content: space-between;
+.weather-item-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #667eea;
+    margin: 10px 0;
 }
 
-.hour {
-    text-align: center;
+.weather-item-label {
     font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-/* ARC */
-.arc {
-    width: 100%;
-    height: 100px;
-    border-top: 2px dashed #38bdf8;
-    border-radius: 50%;
-    position: relative;
+.error-message {
+    background: #ffebee;
+    color: #c62828;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    border-left: 4px solid #c62828;
 }
 
-.sun {
-    width: 20px;
-    height: 20px;
-    background: yellow;
-    border-radius: 50%;
-    position: absolute;
-    top: -10px;
-    left: 50%;
+.chat-history::-webkit-scrollbar {
+    width: 8px;
 }
 
-/* AIR BAR */
-.bar {
-    width: 100%;
-    height: 10px;
-    background: #1e293b;
+.chat-history::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 10px;
 }
 
-.level {
-    height: 100%;
-    width: 35%;
-    background: linear-gradient(90deg, green, yellow, red);
+.chat-history::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.5);
     border-radius: 10px;
 }
 
-/* BUTTON */
-button {
-    padding: 10px 15px;
-    border: none;
-    background: #4e73b8;
+.chat-history::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.8);
+}
+
+.weather-image-container {
+    margin: 15px 0 15px 0;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
     color: white;
-    border-radius: 8px;
-    cursor: pointer;
+    font-weight: bold;
+    font-size: 48px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
-/* INPUT */
-input, select {
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
+.weather-image-container.clear {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+}
+
+.weather-image-container.sunny {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+}
+
+.weather-image-container.cloudy {
+    background: linear-gradient(135deg, #B0C4DE 0%, #708090 100%);
+}
+
+.weather-image-container.rain {
+    background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+}
+
+.weather-image-container.snow {
+    background: linear-gradient(135deg, #E0FFFF 0%, #ADD8E6 100%);
+    color: #333;
+}
+
+.weather-tagline {
+    font-size: 14px;
+    font-weight: normal;
+    opacity: 0.95;
 }
 </style>
 </head>
@@ -141,90 +422,232 @@ input, select {
 <body>
 
 <div class="container">
-
-    <!-- LEFT -->
     <div class="left">
-        <h3>{{user}}</h3>
-        <p>Weather Dashboard</p>
-
+        <h1>
+            {{user}}
+            <a href="/logout" class="logout-btn">Logout</a>
+        </h1>
+        
+        <p style="opacity: 0.9; margin-bottom: 20px;">Weather Dashboard</p>
+        
         <div class="temp">{{weather.temp}}°</div>
-        <div class="weather">Current Weather</div>
+        
+        {% if weather.city %}
+        <div class="weather-info">📍 {{weather.city}}{% if weather.country %}, {{weather.country}}{% endif %}</div>
+        {% endif %}
+        
+        <div class="weather-condition">{{weather.condition}}</div>
     </div>
 
-    <!-- RIGHT -->
     <div class="right">
-
-        <!-- LOCATION -->
         <div class="card">
-            <form method="POST">
-                <input name="location" placeholder="Enter location">
-                <select name="profile">
-                    <option value="farmer">Farmer</option>
-                    <option value="gym">Gym</option>
-                    <option value="student">Student</option>
-                </select>
-                <button>Load</button>
-            </form>
-        </div>
-
-        <!-- CHAT -->
-        <div class="card">
-            <form method="POST" action="/chat">
-                <input name="message" placeholder="Ask weather...">
-                <button>Send</button>
+            <h3>Search Location</h3>
+            {% if error %}
+            <div class="error-message">⚠️ {{error}}</div>
+            {% endif %}
+            <form method="POST" class="location-form">
+                <input type="text" name="location" placeholder="Search city (e.g., London, Tokyo, New York)" value="{{location}}" required>
+                <button type="submit">Search</button>
             </form>
 
-            {% if response %}
-            <p><b>You:</b> {{user_input}}</p>
-            <p><b>AI:</b> {{response}}</p>
+            {% set condition_lower = weather.condition|lower %}
+            {% if 'clear' in condition_lower or 'sunny' in condition_lower %}
+                <div class="weather-image-container sunny">
+                    ☀️
+                    <div class="weather-tagline">Clear & Sunny - Perfect outdoor day!</div>
+                </div>
+            {% elif 'cloud' in condition_lower or 'overcast' in condition_lower %}
+                <div class="weather-image-container cloudy">
+                    ☁️
+                    <div class="weather-tagline">Cloudy - Good time to explore indoors</div>
+                </div>
+            {% elif 'rain' in condition_lower or 'drizzle' in condition_lower or 'shower' in condition_lower %}
+                <div class="weather-image-container rain">
+                    🌧️
+                    <div class="weather-tagline">Rainy - Stay cozy at home!</div>
+                </div>
+            {% elif 'snow' in condition_lower %}
+                <div class="weather-image-container snow">
+                    ❄️
+                    <div class="weather-tagline">Snowy - Winter wonderland awaits!</div>
+                </div>
+            {% elif 'fog' in condition_lower %}
+                <div class="weather-image-container cloudy">
+                    🌫️
+                    <div class="weather-tagline">Foggy - Drive carefully today</div>
+                </div>
+            {% elif 'thunder' in condition_lower or 'storm' in condition_lower %}
+                <div class="weather-image-container rain">
+                    ⛈️
+                    <div class="weather-tagline">Stormy - Stay safe indoors!</div>
+                </div>
+            {% else %}
+                <div class="weather-image-container cloudy">
+                    🌤️
+                    <div class="weather-tagline">Have a great day!</div>
+                </div>
             {% endif %}
         </div>
 
-        <!-- HOURLY -->
         <div class="card dark">
-            <h3>Hourly Forecast</h3>
-            <div class="hourly">
-                <div class="hour">06:00<br>🌤<br>29°</div>
-                <div class="hour">07:00<br>☀️<br>31°</div>
-                <div class="hour">08:00<br>🌧<br>28°</div>
-                <div class="hour">09:00<br>🌧<br>26°</div>
-                <div class="hour">10:00<br>🌤<br>29°</div>
+            <h3>📊 Detailed Weather for {{weather.city}}</h3>
+            <div class="weather-grid">
+                <div class="weather-item">
+                    <div class="weather-item-label">🌡️ Temperature</div>
+                    <div class="weather-item-value">{{weather.temp}}°C</div>
+                </div>
+                <div class="weather-item">
+                    <div class="weather-item-label">💧 Humidity</div>
+                    <div class="weather-item-value">{{weather.humidity}}%</div>
+                </div>
+                <div class="weather-item">
+                    <div class="weather-item-label">💨 Wind Speed</div>
+                    <div class="weather-item-value">{{weather.wind}} m/s</div>
+                </div>
+                <div class="weather-item">
+                    <div class="weather-item-label">⚖️ Pressure</div>
+                    <div class="weather-item-value">{{weather.pressure}} hPa</div>
+                </div>
+                <div class="weather-item">
+                    <div class="weather-item-label">🌤️ Feels Like</div>
+                    <div class="weather-item-value">{{weather.feels}}°C</div>
+                </div>
+                <div class="weather-item">
+                    <div class="weather-item-label">☁️ Condition</div>
+                    <div class="weather-item-value" style="font-size: 16px;">{{weather.condition}}</div>
+                </div>
             </div>
         </div>
 
-        <!-- WEATHER DETAILS -->
-        <div class="card dark">
-            <h3>Current Weather</h3>
-            <div class="grid">
-                <div>Humidity<br><b>{{weather.humidity}}%</b></div>
-                <div>Wind<br><b>{{weather.wind}} km/h</b></div>
-                <div>Pressure<br><b>{{weather.pressure}}</b></div>
-                <div>Feels Like<br><b>{{weather.feels}}°</b></div>
-                <div>UV Index<br><b>{{weather.uv}}</b></div>
-                <div>Rain<br><b>{{weather.temp}}°</b></div>
-            </div>
+        <div class="card">
+            <h3>Your Profile</h3>
+            <form method="POST" class="profile-selector">
+                <select name="profile" onchange="this.form.submit()">
+                    <option value="farmer" {% if profile == 'farmer' %}selected{% endif %}>🌾 Farmer</option>
+                    <option value="gym" {% if profile == 'gym' %}selected{% endif %}>💪 Gym Enthusiast</option>
+                    <option value="student" {% if profile == 'student' %}selected{% endif %}>📚 Student</option>
+                    <option value="traveler" {% if profile == 'traveler' %}selected{% endif %}>🧳 Traveler</option>
+                    <option value="sports" {% if profile == 'sports' %}selected{% endif %}>🏏 Sports Player</option>
+                    <option value="office" {% if profile == 'office' %}selected{% endif %}>🧑‍💼 Office Worker</option>
+                    <option value="rider" {% if profile == 'rider' %}selected{% endif %}>🚴 Delivery Rider</option>
+                    <option value="home" {% if profile == 'home' %}selected{% endif %}>🏡 Homemaker</option>
+                    <option value="photographer" {% if profile == 'photographer' %}selected{% endif %}>📸 Photographer</option>
+                </select>
+            </form>
+            <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                💡 We customize weather tips based on your profile and location.
+            </p>
         </div>
 
-        <!-- SUN ARC -->
-        <div class="card dark">
-            <h3>Sun Cycle</h3>
-            <div class="arc">
-                <div class="sun"></div>
+        <div class="chatbot-container">
+            <div class="chat-header">
+                <span>🤖</span>
+                <div>
+                    <h3>AI Weather Assistant</h3>
+                    <p>Personalized tips for {{profile}} in {{location}}</p>
+                </div>
             </div>
-        </div>
 
-        <!-- AIR QUALITY -->
-        <div class="card dark">
-            <h3>Air Quality</h3>
-            <div class="bar">
-                <div class="level"></div>
+            <div class="chat-history" id="chatHistory">
+                {% if not chat_history and not response %}
+                <div class="bot-message">
+                    <div class="bot-text">Hello! 👋 I'm your AI Weather Assistant. I'm analyzing the weather in <strong>{{location}}</strong> as a <strong>{{profile}}</strong>. Tell me what weather-related tips or advice you need, and I'll provide personalized recommendations based on your profile and current conditions!</div>
+                </div>
+                {% endif %}
+                
+                {% if chat_history %}
+                    {% for chat in chat_history %}
+                    <div class="user-message">
+                        <div class="user-text">{{chat.user_message}}</div>
+                    </div>
+                    <div class="bot-message">
+                        <div class="bot-text">{{chat.bot_response}}</div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                
+                {% if response %}
+                <div class="user-message">
+                    <div class="user-text">{{user_input}}</div>
+                </div>
+                <div class="bot-message">
+                    <div class="bot-text">{{response}}</div>
+                </div>
+                {% endif %}
             </div>
-            <p>Air quality is satisfactory</p>
-        </div>
 
+            <form id="chatForm" class="chat-input-area">
+                <input type="text" id="messageInput" name="message" placeholder="Ask for tips, advice, or weather info..." required>
+                <button type="submit" class="chat-send-btn">Send ➤</button>
+            </form>
+        </div>
     </div>
-
 </div>
+
+<script>
+// Auto-scroll to latest message
+function scrollToBottom() {
+    const chatHistory = document.getElementById('chatHistory');
+    if (chatHistory) {
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+}
+
+// Initial scroll on page load
+scrollToBottom();
+
+// AJAX form submission to prevent page reload
+const chatForm = document.getElementById('chatForm');
+if (chatForm) {
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const messageInput = document.getElementById('messageInput');
+        const userMessage = messageInput.value.trim();
+        
+        if (!userMessage) return;
+        
+        // Add user message to chat history
+        const chatHistory = document.getElementById('chatHistory');
+        const userMsgDiv = document.createElement('div');
+        userMsgDiv.className = 'user-message';
+        userMsgDiv.innerHTML = '<div class="user-text">' + escapeHtml(userMessage) + '</div>';
+        chatHistory.appendChild(userMsgDiv);
+        
+        // Send message to server via AJAX
+        fetch('/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'message=' + encodeURIComponent(userMessage)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Add bot response to chat history
+            const botMsgDiv = document.createElement('div');
+            botMsgDiv.className = 'bot-message';
+            botMsgDiv.innerHTML = '<div class="bot-text">' + escapeHtml(data.response) + '</div>';
+            chatHistory.appendChild(botMsgDiv);
+            
+            // Clear input and scroll
+            messageInput.value = '';
+            scrollToBottom();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error sending message. Please try again.');
+        });
+    });
+}
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
 
 </body>
 </html>

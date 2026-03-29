@@ -3,20 +3,83 @@
 <head>
 <style>
 body {
-    background: #0f172a;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
     color: white;
     text-align: center;
-    padding-top: 100px;
+    padding-top: 50px;
+    margin: 0;
+    font-family: 'Segoe UI';
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 .card {
-    background: #1e293b;
-    padding: 30px;
-    border-radius: 15px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    padding: 40px;
+    border-radius: 20px;
     width: 300px;
-    margin: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
+
+.card h2 {
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+input {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-size: 14px;
+}
+
+input::placeholder {
+    color: rgba(255,255,255,0.7);
+}
+
+button {
+    width: 90%;
+    padding: 12px;
+    margin: 15px 0;
+    border-radius: 10px;
+    border: none;
+    background: #4facfe;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
 button:hover {
-    background: cyan;
+    background: #00f2fe;
+    transform: scale(1.05);
+}
+
+.error {
+    color: #ff6b6b;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.back-link {
+    color: #4facfe;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+.back-link a {
+    color: #00f2fe;
+    text-decoration: none;
+}
+
+.back-link a:hover {
+    text-decoration: underline;
 }
 </style>
 </head>
@@ -25,11 +88,19 @@ button:hover {
 <div class="card">
 <h2>Sign Up</h2>
 
-<form method="POST">
-<input name="username" placeholder="Username">
-<input name="password" type="password" placeholder="Password">
-<button>Create</button>
+<form method="POST" action="/signup">
+<input type="text" name="username" placeholder="Username" required>
+<input type="password" name="password" placeholder="Password (min 4 chars)" required minlength="4">
+<button type="submit">Create Account</button>
 </form>
+
+{% if error %}
+<div class="error">⚠️ Username already exists or invalid input</div>
+{% endif %}
+
+<div class="back-link">
+Already have an account? <a href="/">Login here</a>
+</div>
 </div>
 </body>
 </html>

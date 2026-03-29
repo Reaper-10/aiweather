@@ -2,7 +2,6 @@ from typing import Final, Dict
 import python_weather
 from datetime import datetime, date
 import logging
-import sys
 
 # Optional: Configure logging
 logging.basicConfig(level=logging.ERROR)
@@ -39,11 +38,9 @@ async def getweather(location: str) -> Dict:
 
     except python_weather.Error as e:
         logging.error(f"Weather API error for location '{location}': {e}")
-        sys.exit()
         return {"error": f"Weather data unavailable for '{location}'. Please try again later."}
 
     except Exception as e:
         logging.exception(f"Unexpected error occurred while fetching weather for '{location}':")
-        sys.exit()
         return {"error": "An unexpected error occurred. Please contact support."}
  

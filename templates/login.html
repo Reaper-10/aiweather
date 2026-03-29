@@ -3,176 +3,168 @@
 <head>
 <title>Weather AI</title>
 
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI';
-}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<style>
 body {
+    margin: 0;
+    font-family: 'Segoe UI';
     height: 100vh;
-    background: linear-gradient(135deg, #dfe9f3, #ffffff);
+
+    /* 🔥 CINEMATIC BACKGROUND */
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* MAIN CARD */
+/* MAIN CONTAINER */
 .container {
-    width: 1750px;
-    height: 820px;
-    background: #f5f7fb;
-    border-radius: 30px;
+    width: 950px;
+    height: 520px;
+
     display: flex;
+    border-radius: 30px;
     overflow: hidden;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-    position: relative;
+
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(30px);
+
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
 }
 
 /* LEFT SIDE */
 .left {
-    width: 100%;
+    width: 50%;
     padding: 50px;
-    position: relative;
-}
+    color: white;
 
-/* CURVED EFFECT */
-.left::before {
-    content: "";
-    position: absolute;
-    right: -120px;
-    top: 0;
-    width: 300px;
-    height: 100%;
-    background: #f5f7fb;
-    border-radius: 50%;
-}
-
-/* TEXT */
-.title {
-    font-size: 26px;
-    font-weight: bold;
-}
-
-.subtitle {
-    margin-top: 10px;
-    color: #555;
-}
-
-.temp {
-    font-size: 60px;
-    margin-top: 40px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.temp img {
-    width: 60px;
-    margin-left: 10px;
+.left h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
 }
 
-/* TIMELINE */
-.timeline {
-    margin-top: 40px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
+.left p {
+    opacity: 0.7;
 }
 
 /* RIGHT SIDE */
 .right {
     width: 50%;
-    background: linear-gradient(180deg, #5a8fd8, #3b6fb6);
+    background: linear-gradient(180deg, #4facfe, #00f2fe);
+
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
+/* WEATHER ICON */
 .right img {
-    width: 260px;
+    width: 220px;
+    animation: float 3s ease-in-out infinite;
 }
 
-/* TOP BUTTONS */
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0); }
+}
+
+/* BUTTONS TOP RIGHT */
 .top-buttons {
     position: absolute;
     top: 20px;
-    right: 25px;
+    right: 20px;
 }
 
+/* 3D BUTTONS */
 .btn {
-    padding: 10px 24px;
+    padding: 10px 22px;
     border-radius: 30px;
     border: none;
     cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    font-weight: bold;
+    margin-left: 10px;
+
+    transition: 0.3s;
 }
 
-/* LOGIN */
 .login-btn {
     background: linear-gradient(145deg, #ffeaa7, #f6e58d);
-    box-shadow: 5px 5px 15px rgba(0,0,0,0.2),
-                -5px -5px 10px rgba(255,255,255,0.6);
+    box-shadow: 0 0 15px rgba(255, 234, 167, 0.6);
 }
 
-/* SIGNUP */
 .signup-btn {
     background: linear-gradient(145deg, #dfe6e9, #b2bec3);
-    box-shadow: 5px 5px 15px rgba(0,0,0,0.2),
-                -5px -5px 10px rgba(255,255,255,0.6);
 }
 
 .btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 0 20px rgba(90,143,216,0.7);
-}
-
-.btn:active {
-    transform: scale(0.95);
-}
-
-.login-btn {
-    background: #f6e58d;
-}
-
-.signup-btn {
-    background: #dcdde1;
-}
-
-.btn:hover {
-    transform: scale(1.05);
+    transform: scale(1.1);
+    box-shadow: 0 0 25px rgba(255,255,255,0.8);
 }
 
 /* MODAL */
 .modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.6);
 }
 
+/* MODAL BOX */
 .modal-box {
     background: rgba(255,255,255,0.1);
     backdrop-filter: blur(20px);
+
     width: 320px;
     padding: 30px;
-    margin: 12% auto;
-    border-radius: 25px;
+    margin: 10% auto;
+    border-radius: 20px;
     text-align: center;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3),
-                inset 0 0 10px rgba(255,255,255,0.2);
-    animation: pop 0.4s ease;
+    color: white;
+
+    animation: pop 0.3s ease;
 }
 
 @keyframes pop {
     from { transform: scale(0.8); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+    border: none;
+}
+
+.submit {
+    background: #4facfe;
+    color: white;
+}
+
+/* ERROR TOAST */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: red;
+    padding: 15px;
+    color: white;
+    border-radius: 10px;
+    display: none;
+}
+
+/* MOBILE */
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
@@ -184,55 +176,6 @@ body {
         width: 100%;
         text-align: center;
     }
-
-    .right img {
-        width: 150px;
-    }
-}
-input {
-    width: 90%;
-    padding: 12px;
-    margin: 10px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-}
-input {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: white;
-    outline: none;
-    backdrop-filter: blur(10px);
-}
-
-.submit {
-    background: linear-gradient(45deg, #5a8fd8, #3b6fb6);
-    box-shadow: 0 0 15px rgba(90,143,216,0.6);
-}
-
-.submit:hover {
-    box-shadow: 0 0 30px rgba(90,143,216,1);
-    transform: scale(1.05);
-}
-
-.submit {
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: none;
-    background: #5a8fd8;
-    color: white;
-    cursor: pointer;
-}
-
-/* TOAST */
-.toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #ff4d4d;
-    color: white;
-    padding: 15px;
-    border-radius: 10px;
-    display: none;
 }
 </style>
 </head>
@@ -241,34 +184,19 @@ input {
 
 <div class="container">
 
-    <!-- TOP BUTTONS -->
-    <div class="top-buttons">
-        <button class="btn login-btn" onclick="openModal('login')">Login</button>
-        <button class="btn signup-btn" onclick="openModal('signup')">Sign Up</button>
-    </div>
-
     <!-- LEFT -->
     <div class="left">
-
-        <div class="title">Grab Your Umbrella Today!</div>
-        <div class="subtitle">Weather AI</div>
-
-        <div class="temp">
-            15° C
-            <img src="https://cdn-icons-png.flaticon.com/512/1163/1163657.png">
-        </div>
-
-        <div class="timeline">
-            <div>8:00<br>🌧</div>
-            <div>12:00<br>🌬</div>
-            <div>16:00<br>🌧</div>
-            <div>20:00<br>☀️</div>
-        </div>
-
+        <h1>Weather AI 🌦️</h1>
+        <p>Real-time weather insights with smart predictions</p>
     </div>
 
     <!-- RIGHT -->
     <div class="right">
+        <div class="top-buttons">
+            <button class="btn login-btn" onclick="openModal('login')">Login</button>
+            <button class="btn signup-btn" onclick="openModal('signup')">Sign Up</button>
+        </div>
+
         <img src="https://cdn-icons-png.flaticon.com/512/1779/1779940.png">
     </div>
 
@@ -278,11 +206,15 @@ input {
 <div id="loginModal" class="modal">
     <div class="modal-box">
         <h3>Login</h3>
-        <form method="POST">
-            <input name="username" placeholder="Username">
-            <input name="password" type="password" placeholder="Password">
-            <button class="submit">Login</button>
+        <form method="POST" action="/">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit" class="submit">Login</button>
         </form>
+        {% if error %}
+        <p style="color: #ff6b6b; margin-top: 10px; font-size: 12px;">Invalid username or password</p>
+        {% endif %}
+        <button onclick="closeModal('login')" style="background: #666; width: 90%; padding: 8px; margin-top: 10px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold;">Close</button>
     </div>
 </div>
 
@@ -291,55 +223,52 @@ input {
     <div class="modal-box">
         <h3>Sign Up</h3>
         <form method="POST" action="/signup">
-            <input name="username" placeholder="Username">
-            <input name="password" type="password">
-            <button class="submit">Create</button>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password (min 4 chars)" required minlength="4">
+            <button type="submit" class="submit">Create</button>
         </form>
+        {% if error %}
+        <p style="color: #ff6b6b; margin-top: 10px; font-size: 12px;">Username already exists or invalid input</p>
+        {% endif %}
+        <button onclick="closeModal('signup')" style="background: #666; width: 90%; padding: 8px; margin-top: 10px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold;">Close</button>
     </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="toast">Invalid Credentials</div>
-
 <script>
 function openModal(type) {
-    document.getElementById(type + "Modal").style.display = "block";
-}
-
-// close on outside click
-window.onclick = function(e) {
-    if (e.target.className === "modal") {
-        e.target.style.display = "none";
+    if (type === 'login') {
+        document.getElementById("loginModal").style.display = "block";
+        document.getElementById("signupModal").style.display = "none";
+    } else {
+        document.getElementById("signupModal").style.display = "block";
+        document.getElementById("loginModal").style.display = "none";
     }
 }
-<script>
-function setWeatherBackground(condition) {
-    condition = condition.toLowerCase();
 
-    if (condition.includes("rain")) {
-        document.body.style.background = "linear-gradient(135deg, #2c3e50, #4ca1af)";
-    } 
-    else if (condition.includes("cloud")) {
-        document.body.style.background = "linear-gradient(135deg, #bdc3c7, #2c3e50)";
-    } 
-    else {
-        document.body.style.background = "linear-gradient(135deg, #fceabb, #f8b500)";
+function closeModal(type) {
+    if (type === 'login') {
+        document.getElementById("loginModal").style.display = "none";
+    } else {
+        document.getElementById("signupModal").style.display = "none";
     }
 }
-</script>
-// show error
-function showToast() {
-    let t = document.getElementById("toast");
-    t.style.display = "block";
-    setTimeout(() => t.style.display = "none", 2500);
-}
-</script>
-{% if error %}
-<script>showToast()</script>
-{% endif %}
 
-<script>
-setWeatherBackground("{{weather.condition}}");
+// Close modal when clicking outside
+window.onclick = function(event) {
+    let loginModal = document.getElementById("loginModal");
+    let signupModal = document.getElementById("signupModal");
+    if (event.target == loginModal) loginModal.style.display = "none";
+    if (event.target == signupModal) signupModal.style.display = "none";
+}
+
+// Close modals on Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === "Escape") {
+        document.getElementById("loginModal").style.display = "none";
+        document.getElementById("signupModal").style.display = "none";
+    }
+});
 </script>
+
 </body>
 </html>
