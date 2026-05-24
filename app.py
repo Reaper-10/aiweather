@@ -51,19 +51,54 @@ def get_real_weather(city):
         lat = geo_res["results"][0]["latitude"]
         lon = geo_res["results"][0]["longitude"]
 
-        weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,pressure_msl"
+        weather_url = (
+            f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}"
+            f"&current_weather=true"
+            f"&hourly=relativehumidity_2m,apparent_temperature,pressure_msl"
+            f"&daily=weathercode,temperature_2m_max,temperature_2m_min"
+            f"&timezone=auto"
+        )
         data = requests.get(weather_url).json()
 
-        current = data["current"]
+        current = data.get("current_weather")
+        if not current:
+            return None
+
+        humidity = "N/A"
+        feels = "N/A"
+        pressure = "N/A"
+        hourly = data.get("hourly", {})
+        current_time = current.get("time")
+        if current_time and hourly.get("time"):
+            try:
+                idx = hourly["time"].index(current_time)
+                humidity = hourly.get("relativehumidity_2m", ["N/A"])[idx]
+                pressure = hourly.get("pressure_msl", ["N/A"])[idx]
+                feels = round(hourly.get("apparent_temperature", [current.get("temperature")])[idx])
+            except ValueError:
+                humidity = hourly.get("relativehumidity_2m", ["N/A"])[0]
+                pressure = hourly.get("pressure_msl", ["N/A"])[0]
+                feels = round(hourly.get("apparent_temperature", [current.get("temperature")])[0])
+
+        forecast = []
+        daily = data.get("daily", {})
+        for i, day in enumerate(daily.get("time", [])):
+            forecast.append({
+                "date": day,
+                "condition": WEATHER_CODES.get(daily.get("weathercode", [])[i], "Unknown"),
+                "temp_max": round(daily.get("temperature_2m_max", [0])[i]),
+                "temp_min": round(daily.get("temperature_2m_min", [0])[i])
+            })
 
         return {
-            "temp": round(current["temperature_2m"]),
-            "humidity": current["relative_humidity_2m"],
-            "pressure": current.get("pressure_msl", 1013),
-            "wind": current["wind_speed_10m"],
-            "feels": round(current["apparent_temperature"]),
-            "condition": WEATHER_CODES.get(current["weather_code"], "Unknown"),
-            "city": city
+            "temp": round(current["temperature"]),
+            "humidity": humidity,
+            "pressure": pressure,
+            "wind": current.get("windspeed", "N/A"),
+            "feels": feels,
+            "condition": WEATHER_CODES.get(current.get("weathercode"), "Unknown"),
+            "city": city,
+            "forecast": forecast
         }
 
     except:

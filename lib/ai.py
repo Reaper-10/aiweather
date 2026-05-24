@@ -15,11 +15,8 @@ def analyze(weather: Dict, prompt: str):
         if not OLLAMA_MODEL:
             raise Exception("OLLAMA_MODEL environment variable not set for Ollama integration")
         try:
-            # Use the Ollama CLI to run the model with the prompt
-            # Command: `ollama run <model> --prompt <prompt>`
             proc = subprocess.run(["ollama", "run", OLLAMA_MODEL, "--prompt", prompt], capture_output=True, text=True, timeout=30)
             if proc.returncode == 0:
-                # Ollama prints the generated text to stdout
                 return proc.stdout.strip()
             else:
                 raise Exception(proc.stderr.strip() or "ollama run failed")
@@ -31,68 +28,156 @@ def analyze(weather: Dict, prompt: str):
     condition = weather.get("condition", "Unknown").lower()
     temp = weather.get("temp", "N/A")
     city = weather.get("city", "your location")
+    humidity = weather.get("humidity", "N/A")
+    wind = weather.get("wind", "N/A")
+    feels = weather.get("feels", temp)
     forecast = weather.get("forecast", [])
     prompt_lower = prompt.lower()
     
-    # Extract user message from prompt
     user_message = ""
-    if "User asks:" in prompt:
-        user_message = prompt.split("User asks:", 1)[1].strip().lower()
-    
-    # Convert temperature to int for comparisons
-    try:
-        temp_int = int(temp) if isinstance(temp, str) else temp
-    except:
-        temp_int = 20  # Default to moderate temperature
-    
-    # Extract profile from prompt
-    profile = ""
-    if "farmer" in prompt_lower:
-        profile = "farmer"
-    elif "gym" in prompt_lower:
-        profile = "gym"
-    elif "student" in prompt_lower:
-        profile = "student"
-    elif "traveler" in prompt_lower:
-        profile = "traveler"
-    elif "sports" in prompt_lower:
-        profile = "sports"
-    elif "office" in prompt_lower:
-        profile = "office"
-    elif "rider" in prompt_lower:
-        profile = "rider"
-    elif "home" in prompt_lower:
-        profile = "home"
-    elif "photographer" in prompt_lower:
-        profile = "photographer"
-    
-    # Handle specific queries first
-    if any(word in user_message for word in ["hello", "hi", "hey", "greetings"]):
+    if "user asks:" in prompt_lower:
+        user_message = prompt_lower.split("user asks:", 1)[1].strip()
+
+    temp_int = try_parse_int(temp, default=20)
+    profile = extract_profile(prompt_lower)
+    intent = classify_intent(user_message)
+
+    if intent == "greeting":
         greeting = "Hello! 👋 I'm your AI Weather Assistant."
         if profile:
             greeting += f" I'm analyzing the weather in {city} as a {profile}."
         return f"{greeting} {get_profile_advice(profile, condition, temp_int, temp)}"
-    
-    elif "temperature" in user_message or "temp" in user_message or "hot" in user_message or "cold" in user_message:
-        return f"🌡️ Current temperature in {city} is {temp}°C (feels like {weather.get('feels', temp)}°C). {get_profile_advice(profile, condition, temp_int, temp)}"
-    
-    elif "tomorrow" in user_message or "forecast" in user_message:
-        if forecast and len(forecast) > 0:
-            tomorrow = forecast[0]
-            return f"🌅 Tomorrow in {city}: {tomorrow['condition']} with highs of {tomorrow['temp_max']}°C and lows of {tomorrow['temp_min']}°C. {get_profile_advice(profile, tomorrow['condition'].lower(), (tomorrow['temp_max'] + tomorrow['temp_min']) // 2, tomorrow['temp_max'])}"
-        else:
-            return f"📅 Forecast unavailable. Current weather: {condition} at {temp}°C. {get_profile_advice(profile, condition, temp_int, temp)}"
-    
-    elif "weather report" in user_message or "report" in user_message or "summary" in user_message:
-        humidity = weather.get("humidity", "N/A")
-        wind = weather.get("wind", "N/A")
-        report = f"📊 Weather Report for {city}:\n• Temperature: {temp}°C (feels {weather.get('feels', temp)}°C)\n• Condition: {weather.get('condition', 'Unknown')}\n• Humidity: {humidity}%\n• Wind: {wind} m/s"
-        if forecast and len(forecast) > 1:
-            report += f"\n• Tomorrow: {forecast[0]['condition']}, {forecast[0]['temp_max']}/{forecast[0]['temp_min']}°C"
-        return f"{report}\n\n💡 {get_profile_advice(profile, condition, temp_int, temp)}"
-    
-    # Default: provide profile-specific advice
+
+    if intent == "temperature":
+        return f"🌡️ Current temperature in {city} is {temp}°C (feels like {feels}°C). {get_profile_advice(profile, condition, temp_int, temp)}"
+
+    if intent == "rain":
+        answer = build_rain_response(city, user_message, condition, forecast, profile, temp_int, temp)
+        return answer
+
+    if intent == "humidity":
+        return f"💧 Current humidity in {city} is {humidity}%. {get_profile_advice(profile, condition, temp_int, temp)}"
+
+    if intent == "wind":
+        return f"🍃 Wind in {city} is {wind} m/s. {get_profile_advice(profile, condition, temp_int, temp)}"
+
+    if intent == "pressure":
+        return f"📈 Current pressure in {city} is {weather.get('pressure', 'N/A')} hPa. {get_profile_advice(profile, condition, temp_int, temp)}"
+
+    if intent == "forecast":
+        future = select_forecast_day(forecast)
+        if future:
+            return f"🌅 {future['date']} in {city}: {future['condition']} with highs of {future['temp_max']}°C and lows of {future['temp_min']}°C. {get_profile_advice(profile, future['condition'].lower(), (future['temp_max'] + future['temp_min']) // 2, future['temp_max'])}"
+        return f"📅 Forecast unavailable. Current weather: {condition} at {temp}°C. {get_profile_advice(profile, condition, temp_int, temp)}"
+
+    if intent == "advice":
+        return f"💡 Here's your weather advice for {city}: {get_profile_advice(profile, condition, temp_int, temp)}"
+
+    if intent == "travel":
+        return f"🧳 Travel advice for {city}: {get_profile_advice(profile, condition, temp_int, temp)}"
+
+    if intent == "report":
+        return build_report(city, condition, temp, feels, humidity, wind, forecast, profile, temp_int)
+
     return get_profile_advice(profile, condition, temp_int, temp)
+
+
+def try_parse_int(value, default=20):
+    try:
+        return int(value) if isinstance(value, str) else value
+    except Exception:
+        return default
+
+
+def extract_profile(text: str) -> str:
+    profiles = ["farmer", "gym", "student", "traveler", "sports", "office", "rider", "home", "photographer"]
+    for profile in profiles:
+        if profile in text:
+            return profile
+    return ""
+
+
+def classify_intent(message: str) -> str:
+    if not message:
+        return "general"
+
+    rain_terms = ["rain", "rainfall", "drizzle", "shower", "thunder", "storm", "wet"]
+    forecast_terms = ["tomorrow", "forecast", "next day", "weekend", "upcoming"]
+    temp_terms = ["temperature", "temp", "hot", "cold", "heat", "chill"]
+    humidity_terms = ["humidity", "humid", "dry"]
+    travel_terms = ["travel", "commute", "trip", "journey", "drive", "road", "flight", "station"]
+    wind_terms = ["wind", "breeze", "gust"]
+    pressure_terms = ["pressure", "barometer", "atmosphere"]
+    advice_terms = ["advice", "should i", "can i", "recommend", "planning", "plan"]
+    report_terms = ["report", "summary", "overview"]
+    greeting_terms = ["hello", "hi", "hey", "greetings", "good morning", "good evening"]
+
+    if any(term in message for term in greeting_terms):
+        return "greeting"
+    if any(term in message for term in rain_terms):
+        if any(term in message for term in forecast_terms):
+            return "rain"
+        return "rain"
+    if any(term in message for term in humidity_terms):
+        return "humidity"
+    if any(term in message for term in wind_terms):
+        return "wind"
+    if any(term in message for term in pressure_terms):
+        return "pressure"
+    if any(term in message for term in report_terms):
+        return "report"
+    if any(term in message for term in travel_terms):
+        return "travel"
+    if any(term in message for term in advice_terms):
+        return "advice"
+    if any(term in message for term in temp_terms):
+        return "temperature"
+    if any(term in message for term in forecast_terms):
+        return "forecast"
+    return "general"
+
+
+def select_forecast_day(forecast: list) -> dict:
+    if not forecast:
+        return None
+    if len(forecast) > 1:
+        return forecast[1]
+    return forecast[0]
+
+
+def is_rain_condition(condition: str) -> bool:
+    return any(keyword in condition for keyword in ["rain", "drizzle", "shower", "storm", "thunder"])
+
+
+def build_rain_response(city: str, user_message: str, condition: str, forecast: list, profile: str, temp_int: int, temp: str) -> str:
+    target = "tomorrow" if "tomorrow" in user_message or "next" in user_message else "today"
+    future = select_forecast_day(forecast)
+    if future and target == "tomorrow" and len(forecast) > 1:
+        future = forecast[1]
+    if future and is_rain_condition(future["condition"].lower()):
+        response = f"🌧️ Rain is likely in {city} {target}, with {future['condition']} and temperatures from {future['temp_min']}°C to {future['temp_max']}°C."
+        response += f" {get_profile_advice(profile, future['condition'].lower(), (future['temp_max'] + future['temp_min']) // 2, future['temp_max'])}"
+        return response
+    if future:
+        response = f"☀️ No significant rain expected in {city} {target}. Forecast shows {future['condition']} with highs around {future['temp_max']}°C."
+        response += f" {get_profile_advice(profile, condition, temp_int, temp)}"
+        return response
+    return f"🌧️ I don't have a forecast available for rain in {city}, but current conditions are {condition} at {temp}°C. {get_profile_advice(profile, condition, temp_int, temp)}"
+
+
+def build_report(city: str, condition: str, temp: str, feels: str, humidity: str, wind: str, forecast: list, profile: str, temp_int: int) -> str:
+    report = (
+        f"📊 Weather Report for {city}:\n"
+        f"• Temperature: {temp}°C (feels like {feels}°C)\n"
+        f"• Condition: {condition.title()}\n"
+        f"• Humidity: {humidity}%\n"
+        f"• Wind: {wind} m/s"
+    )
+    future = select_forecast_day(forecast)
+    if future:
+        report += f"\n• Tomorrow: {future['condition']}, {future['temp_max']}/{future['temp_min']}°C"
+    report += f"\n\n💡 {get_profile_advice(profile, condition, temp_int, temp)}"
+    return report
 
 def get_profile_advice(profile: str, condition: str, temp_int: int, temp: str) -> str:
     """Get profile-specific weather advice"""
