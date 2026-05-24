@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+from lib.ai import analyze
+import traceback
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -122,8 +124,18 @@ def dashboard():
     if "user" not in session:
         return redirect("/")
 
-    location = request.form.get("location") or session.get("location", "Bangalore")
-    session["location"] = location
+    # Update location and profile from form if provided
+    form_location = request.form.get("location")
+    form_profile = request.form.get("profile")
+
+    if form_location:
+        session["location"] = form_location
+
+    if form_profile:
+        session["profile"] = form_profile
+
+    location = session.get("location", "Bangalore")
+    profile = session.get("profile", "student")
 
     weather = get_real_weather(location)
 
@@ -142,7 +154,8 @@ def dashboard():
         "dashboard.html",
         weather=weather,
         location=location,
-        user=session["user"]
+        user=session["user"],
+        profile=profile
     )
 
 # -------- CHAT --------
@@ -156,12 +169,39 @@ def chat():
 
     weather = get_real_weather(location)
 
-    if weather:
-        response = f"In {location}, it is {weather['temp']}°C with {weather['condition']}."
-    else:
-        response = "Weather data unavailable."
+    # Build a minimal weather dict if unavailable so AI still has context
+    if not weather:
+        weather = {
+            "temp": "N/A",
+            "humidity": "N/A",
+            "pressure": "N/A",
+            "wind": "N/A",
+            "feels": "N/A",
+            "condition": "Unknown",
+            "city": location,
+            "forecast": []
+        }
 
-    return jsonify({"response": response})
+    # Include profile hint if present in session
+    profile = session.get("profile")
+
+    # Construct prompt similar to CLI flow: include user message and optional profile hints
+    if profile:
+        prompt = f"User asks: {msg} (Profile: {profile})"
+    else:
+        prompt = f"User asks: {msg}"
+
+    try:
+        print(f"[chat] message={msg!r} profile={profile!r} location={location!r}")
+        response = analyze(weather, prompt)
+        print(f"[chat] ai response={response!r}")
+        return jsonify({"response": response, "user_input": msg})
+    except Exception as e:
+        tb = traceback.format_exc()
+        print("[chat] analyze() raised exception:\n", tb)
+        # Fallback simple weather reply on failure and include error for debugging
+        response = f"In {location}, it is {weather.get('temp')}°C with {weather.get('condition')}."
+        return jsonify({"response": response, "user_input": msg, "error": str(e)})
 
 # -------- LOGOUT --------
 @app.route("/logout")

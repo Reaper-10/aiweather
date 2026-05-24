@@ -1,13 +1,33 @@
 from typing import Final, Dict
 import os
 from dotenv import load_dotenv
+import subprocess
 
 load_dotenv()
 MODEL: Final[str] = os.getenv("MODEL", "gpt-4")
+OLLAMA_MODEL: Final[str] = os.getenv("OLLAMA_MODEL", "")
 
 # Use local AI for reliable, short, profile-aware responses
 def analyze(weather: Dict, prompt: str):
     """Analyze weather data and respond with profile-specific tips"""
+    # If configured to use Ollama, delegate the prompt to the local Ollama CLI
+    if MODEL == "ollama":
+        if not OLLAMA_MODEL:
+            raise Exception("OLLAMA_MODEL environment variable not set for Ollama integration")
+        try:
+            # Use the Ollama CLI to run the model with the prompt
+            # Command: `ollama run <model> --prompt <prompt>`
+            proc = subprocess.run(["ollama", "run", OLLAMA_MODEL, "--prompt", prompt], capture_output=True, text=True, timeout=30)
+            if proc.returncode == 0:
+                # Ollama prints the generated text to stdout
+                return proc.stdout.strip()
+            else:
+                raise Exception(proc.stderr.strip() or "ollama run failed")
+        except FileNotFoundError:
+            raise Exception("ollama CLI not found. Is Ollama installed and on PATH?")
+        except subprocess.TimeoutExpired:
+            raise Exception("ollama run timed out")
+
     condition = weather.get("condition", "Unknown").lower()
     temp = weather.get("temp", "N/A")
     city = weather.get("city", "your location")
