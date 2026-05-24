@@ -8,6 +8,19 @@ from dotenv import load_dotenv
 load_dotenv()
 from lib.ai import analyze
 import traceback
+import sys
+
+
+def _safe_print(*args, **kwargs):
+    """Print safely to consoles that may not support Unicode (fallback to utf-8 bytes)."""
+    try:
+        print(*args, **kwargs)
+    except Exception:
+        try:
+            text = " ".join(str(a) for a in args) + ("\n" if not kwargs.get("end") else "")
+            sys.stdout.buffer.write(text.encode("utf-8", errors="replace"))
+        except Exception:
+            pass
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -192,9 +205,9 @@ def chat():
         prompt = f"User asks: {msg}"
 
     try:
-        print(f"[chat] message={msg!r} profile={profile!r} location={location!r}")
+        _safe_print(f"[chat] message={msg!r} profile={profile!r} location={location!r}")
         response = analyze(weather, prompt)
-        print(f"[chat] ai response={response!r}")
+        _safe_print("[chat] ai response:", response)
         return jsonify({"response": response, "user_input": msg})
     except Exception as e:
         tb = traceback.format_exc()
